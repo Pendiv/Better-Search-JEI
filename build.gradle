@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        mavenCentral()
+    }
+    dependencies { classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT' }
+}
+
+plugins { id 'net.minecraftforge.gradle' version '[6.0.16,6.2)' }
+apply plugin: 'org.spongepowered.mixin'
+
+group = 'DIV.bilingualsearch'
+version = '1.1.0'
+base { archivesName = 'betterSearchJEI-forge-1.20.1' }
+java { toolchain.languageVersion = JavaLanguageVersion.of(17) }
+
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'info'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', layout.buildDirectory.file('createSrgToMcp/output.srg').get().asFile.absolutePath
+            mods { bilingualsearch { source sourceSets.main } }
+        }
+    }
+}
+
+repositories {
+    maven { url = 'https://maven.blamejared.com/' }
+    mavenCentral()
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.4.15'
+    compileOnly fg.deobf('mezz.jei:jei-1.20.1-forge:15.20.0.115')
+    runtimeOnly fg.deobf('mezz.jei:jei-1.20.1-forge:15.20.0.115')
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+configurations.configureEach { if (name == '__obfuscated') transitive = false }
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.incremental = false
+}
+
+mixin {
+    add sourceSets.main, 'bilingualsearch.refmap.json'
+    config 'bilingualsearch.mixins.json'
+}
+
+tasks.named('jar', Jar).configure {
+    from('LICENSE')
+    manifest {
+        attributes('Implementation-Version': project.version, 'MixinConfigs': 'bilingualsearch.mixins.json')
+    }
+    finalizedBy 'reobfJar'
+}
+
+tasks.configureEach {
+    if (name == 'runClient') dependsOn 'createSrgToMcp'
+}
