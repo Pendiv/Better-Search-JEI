@@ -14,6 +14,7 @@ public final class BilingualSearchMixinPlugin implements IMixinConfigPlugin {
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         return switch (mixinClassName) {
             case "DIV.bilingualsearch.mixin.CreativeSearchNamesMixin" -> !LegacySearch.provides(LegacySearch.CREATIVE_ALIASES);
+            case "DIV.bilingualsearch.mixin.LegacyChineseSearchNamesMixin" -> LegacySearch.provides(LegacySearch.JEI_ALIASES);
             case "DIV.bilingualsearch.mixin.JeiSearchSyntaxMixin" -> hasJei();
             case "DIV.bilingualsearch.mixin.JeiImeSearchMixin" -> hasJei() && !LegacySearch.provides(LegacySearch.JEI_IME);
             case "DIV.bilingualsearch.mixin.LegacyImeSearchTermsMixin" ->

@@ -7,7 +7,7 @@ modId="bilingualsearch"
 version="${file.jarVersion}"
 displayName="betterSearchJEI"
 displayTest="IGNORE_ALL_VERSION"
-description='''Search item and fluid names in Japanese and English. Use kana, fullwidth text, and fullwidth search operators in JEI.'''
+description='''Search item and fluid names in Japanese, English, and Chinese, including Pinyin. Use kana, fullwidth text, and fullwidth search operators in JEI.'''
 
 [[dependencies.bilingualsearch]]
 modId="forge"
