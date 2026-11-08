@@ -26,6 +26,6 @@ side="BOTH"
 [[dependencies.bilingualsearch]]
 modId="jei"
 mandatory=false
-versionRange="[15.20.0.112,15.21)"
+versionRange="[15.20.0.112,15.21),[15.49.0.200],[15.74.0.234]"
 ordering="AFTER"
 side="CLIENT"

@@ -1,6 +1,7 @@
 package DIV.bilingualsearch.mixin;
 
 import DIV.bilingualsearch.client.ImeSearchTerms;
+import DIV.bilingualsearch.jei.JeiSearchToken;
 import mezz.jei.gui.ingredients.IListElement;
 import mezz.jei.gui.search.ElementPrefixParser.TokenInfo;
 import mezz.jei.gui.search.IElementSearch;
@@ -43,7 +44,9 @@ public abstract class JeiImeSearchMixin {
         Set<IListElement<?>> combined = Collections.newSetFromMap(new IdentityHashMap<>());
         combined.addAll(original);
         for (String alternative : alternatives) {
-            combined.addAll(lookup.apply(new TokenInfo(alternative, token.prefixInfo())));
+            var rewritten = JeiSearchToken.withText(token, alternative);
+            if (rewritten == null) return original;
+            combined.addAll(lookup.apply(rewritten));
         }
         return combined;
     }

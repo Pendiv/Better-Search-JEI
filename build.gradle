@@ -10,7 +10,7 @@ plugins { id 'net.minecraftforge.gradle' version '[6.0.16,6.2)' }
 apply plugin: 'org.spongepowered.mixin'
 
 group = 'DIV.bilingualsearch'
-version = '1.1.0'
+version = '1.1.2'
 base { archivesName = 'betterSearchJEI-forge-1.20.1' }
 java { toolchain.languageVersion = JavaLanguageVersion.of(17) }
 

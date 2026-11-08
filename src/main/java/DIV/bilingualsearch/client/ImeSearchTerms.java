@@ -36,16 +36,21 @@ public final class ImeSearchTerms {
 
     /** Alternatives to a single parsed search term. The caller retains the original term. */
     public static List<String> alternatives(String term) {
-        String widthFolded = foldWidth(term);
-        if (!hasKanaWithoutKanji(widthFolded)) {
-            return widthFolded.equals(term) ? List.of() : List.of(widthFolded);
+        String asciiFolded = foldWidth(term);
+        String widthFolded = foldKanaWidth(asciiFolded);
+        boolean romanize = hasKanaWithoutKanji(widthFolded);
+        if (!romanize && widthFolded.equals(asciiFolded)) {
+            return asciiFolded.equals(term) ? List.of() : List.of(asciiFolded);
         }
 
-        String kana = normalizeKana(widthFolded);
         var result = new LinkedHashSet<String>();
+        result.add(asciiFolded);
         result.add(widthFolded);
-        result.add(kana);
-        addRomanizations(kana, result);
+        if (romanize) {
+            String kana = normalizeKana(widthFolded);
+            result.add(kana);
+            addRomanizations(kana, result);
+        }
         result.remove(term);
         return List.copyOf(result);
     }
@@ -179,22 +184,27 @@ public final class ImeSearchTerms {
         return hasKana;
     }
 
-    private static String normalizeKana(String text) {
-        var result = new StringBuilder(text.length());
+    private static String foldKanaWidth(String text) {
+        StringBuilder result = null;
         for (int i = 0; i < text.length();) {
             char character = text.charAt(i);
             if (character >= '\uff66' && character <= '\uff9f') {
+                if (result == null) result = new StringBuilder(text.length()).append(text, 0, i);
                 int end = i + 1;
                 while (end < text.length() && text.charAt(end) >= '\uff66' && text.charAt(end) <= '\uff9f') end++;
                 result.append(Normalizer.normalize(text.substring(i, end), Normalizer.Form.NFKC));
                 i = end;
             } else {
-                result.append(character);
+                if (result != null) result.append(character);
                 i++;
             }
         }
-        String composed = Normalizer.normalize(result, Normalizer.Form.NFC);
-        result.setLength(0);
+        return result == null ? text : result.toString();
+    }
+
+    private static String normalizeKana(String text) {
+        String composed = Normalizer.normalize(text, Normalizer.Form.NFC);
+        var result = new StringBuilder(composed.length());
         for (int i = 0; i < composed.length(); i++) {
             char character = composed.charAt(i);
             if (character >= 'ァ' && character <= 'ヶ') character -= 0x60;
